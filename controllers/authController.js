@@ -35,19 +35,27 @@ passport.deserializeUser(async (id, done) => {
 });
 
 const register = async (req, res) => {
-  const { username, password } = req.body;
-  const hashedPassword = await bcrypt.hash(password, 10);
-  await User.create({ username, password: hashedPassword });
-  res.redirect('/login');
+  try {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).send('Username and password are required');
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await User.create({ username, password: hashedPassword });
+    res.redirect('/login.html');
+  } catch (error) {
+    console.error('Error registering user:', error);
+    res.status(500).send('Internal server error');
+  }
 };
 
 const login = (req, res) => {
-  res.redirect('/inventory');
+  res.redirect('/inventory.html');
 };
 
 const logout = (req, res) => {
   req.logout();
-  res.redirect('/login');
+  res.redirect('/login.html');
 };
 
 module.exports = {
